@@ -14,34 +14,47 @@ pipeline {
             }
         }
 
-        stage('Build (Maven)') {
+        stage('Build') {
             steps {
-                sh 'mvn -v'
                 sh 'mvn clean package'
             }
         }
-
-        stage('Build Image (Docker)') {
+        stage('Test') {
             steps {
-                sh 'docker version'
-                sh 'docker build -t $IMAGE_NAME .'
+                sh 'mvn test'
+            }
+        }
+        stage('Publish & Deploy') {
+            steps {
+                sh 'mvn deploy'
             }
         }
 
-        stage('Run (Docker)') {
+
+        stage('Build Image') {
             steps {
-                sh '''
-                    docker rm -f $CONTAINER_NAME || true
-                    docker run --name $CONTAINER_NAME $IMAGE_NAME
-                '''
+                //sh 'docker build -t dockercorona/jenkinstest ./pushdockerimage/' (this will use the tag latest)
+		sh 'docker build -t valvahen/finale:$BUILD_NUMBER ./pushdockerimage/'
+            }
+        }
+        stage('Docker Login') {
+            steps {
+                //sh 'docker login -u $DOCKERHUB_CREDS_USR -p $DOCKERHUB_CREDS_PSW' (this will leave the password visible)
+                sh 'echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin'                
+                }
+            }
+        stage('Docker Push') {
+            steps {
+		//sh 'docker push dockercorona/jenkinstest' (this will use the tag latest)    
+                sh 'docker push valvahen/finale:$BUILD_NUMBER'
+                }
             }
         }
     }
 
     post {
         always {
-            sh 'docker rm -f $CONTAINER_NAME || true'
-            sh 'docker image prune -f || true'
+            sh 'docker logout'
         }
     }
 }
