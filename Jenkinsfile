@@ -24,12 +24,6 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        stage('Publish & Deploy') {
-            steps {
-                sh 'mvn deploy'
-            }
-        }
-
 
         stage('Build Image') {
             steps {
