@@ -34,7 +34,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 //sh 'docker build -t dockercorona/jenkinstest ./pushdockerimage/' (this will use the tag latest)
-		sh 'docker build -t valvahen/finale:$BUILD_NUMBER ./pushdockerimage/'
+		sh 'docker build -t valvahen/finale:$BUILD_NUMBER .
             }
         }
         stage('Docker Login') {
