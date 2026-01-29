@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "hello-ci:${BUILD_NUMBER}"
         CONTAINER_NAME = "hello-ci-run"
+        DOCKERHUB_CREDS = credentials('dockerhub-creds')
     }
 
     stages {
